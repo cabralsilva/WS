@@ -269,15 +269,14 @@ public class PedidoServices extends ControlServices {
 				retorno.setModel(p);
 			}
 			rs.close();
-		} else if(numeroRegistros == 0){
+		} else if (numeroRegistros == 0) {
 			rs.close();
 			throw new SQLException("Nenhum Registro encontrado");
-		} else if(numeroRegistros > 1){
+		} else if (numeroRegistros > 1) {
 			rs.close();
 			throw new SQLException("Mais de um pedido com o mesmo código encontrado! ");
 		}
 
-		
 		return retorno;
 	}
 

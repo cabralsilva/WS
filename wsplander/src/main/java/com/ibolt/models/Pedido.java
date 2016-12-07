@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="model")
-public class Pedido {
+public class Pedido extends AutenticacaoAcesso{
     @XmlElement
     private Long codigoPedido;
     @XmlElement
