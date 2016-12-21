@@ -893,33 +893,40 @@ public class WS {
 	@POST
 	@Path(value = "/pesquisarEmailCliente")
 	@Produces(value = { "application/json; charset=UTF-8" })
-	public Response searchEmailClient(@FormParam(value = "email") String email) {
-		System.out.println("Email: " + email);
-		ClienteService cs = new ClienteService();
-		try {
-			cs.CreateConnection();
-		} catch (Exception e) {
-			System.out.println("Erro ao criar a conexão: " + e);
-			RetornoWS<Object> retorno = new RetornoWS<Object>();
-			retorno.setCodStatus(Long.valueOf(4));
-			retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
-			retorno.setModel((Object) null);
-			e.printStackTrace();
-			return Response.ok((Object) retorno).build();
-		}
-		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
-		try {
-			retorno = cs.searchEmail(email.toLowerCase());
-			cs.CloseConnection();
-			System.out.println((Object) retorno);
-			return Response.ok((Object) retorno).build();
-		} catch (SQLException e) {
-			System.out.println("Erro: " + e);
-			RetornoWS<Object> retornoE = new RetornoWS<Object>();
-			retornoE.setCodStatus(Long.valueOf(4));
-			retornoE.setMsg("Erro ao criar pedido!" + e.getMessage());
-			retornoE.setModel((Object) null);
-			return Response.ok((Object) retornoE).build();
+	public Response searchEmailClient(@FormParam(value = "email") String email, @FormParam(value = "usr") String usr,
+			@FormParam(value = "pwd") String pwd) {
+		if ((usr.equals("pdroqtl")) && (pwd.equals("jck9com*"))) {
+			System.out.println("Email: " + email);
+			ClienteService cs = new ClienteService();
+			try {
+				cs.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+			try {
+				retorno = cs.searchEmail(email.toLowerCase());
+				cs.CloseConnection();
+				System.out.println((Object) retorno);
+				return Response.ok((Object) retorno).build();
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(4));
+				retornoE.setMsg("Erro ao criar pedido!" + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
+		} else
+
+		{
+			return Response.status(404).build();
 		}
 
 	}
@@ -927,52 +934,59 @@ public class WS {
 	@POST
 	@Path(value = "/insereNewsletter")
 	@Produces(value = { "application/json; charset=UTF-8" })
-	public Response insertNewsletter(@FormParam(value = "email") String email) {
-		System.out.println("Email Newsletter: " + email);
-		ClienteService cs = new ClienteService();
-		try {
-			cs.CreateConnection();
-		} catch (Exception e) {
-			System.out.println("Erro ao criar a conexão: " + e);
-			RetornoWS<Object> retorno = new RetornoWS<Object>();
-			retorno.setCodStatus(Long.valueOf(4));
-			retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
-			retorno.setModel((Object) null);
-			e.printStackTrace();
-			return Response.ok((Object) retorno).build();
-		}
-		RetornoWS<String> retorno = new RetornoWS<String>();
-		try {
-			retorno = cs.searchEmailNewsletter(email);
-			if (retorno.getCodStatus() != 1) {
-				cs.CloseConnection();
-				System.out.println((Object) retorno);
+	public Response insertNewsletter(@FormParam(value = "email") String email, @FormParam(value = "usr") String usr,
+			@FormParam(value = "pwd") String pwd) {
+		if ((usr.equals("pdroqtl")) && (pwd.equals("jck9com*"))) {
+			System.out.println("Email Newsletter: " + email);
+			ClienteService cs = new ClienteService();
+			try {
+				cs.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
 				return Response.ok((Object) retorno).build();
 			}
-		} catch (SQLException e) {
-			System.out.println("Erro: " + e);
-			RetornoWS<Object> retornoE = new RetornoWS<Object>();
-			retornoE.setCodStatus(Long.valueOf(3));
-			retornoE.setMsg("Erro ao verificar email! " + e.getMessage());
-			retornoE.setModel((Object) null);
-			return Response.ok((Object) retornoE).build();
+			RetornoWS<String> retorno = new RetornoWS<String>();
+			try {
+				retorno = cs.searchEmailNewsletter(email);
+				if (retorno.getCodStatus() != 1) {
+					cs.CloseConnection();
+					System.out.println((Object) retorno);
+					return Response.ok((Object) retorno).build();
+				}
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(3));
+				retornoE.setMsg("Erro ao verificar email! " + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
+			try {
+				cs.insertNewsletter(email);
+				retorno.setCodStatus(Long.valueOf(1));
+				retorno.setMsg("Cadastro realizado.");
+				retorno.setModel(null);
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(3));
+				retornoE.setMsg("Erro ao cadastrar newsletter! " + e.getMessage());
+				retornoE.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retornoE).build();
+			}
+			System.out.println((Object) retorno);
+			return Response.ok((Object) retorno).build();
+		} else
+
+		{
+			return Response.status(404).build();
 		}
-		try {
-			cs.insertNewsletter(email);
-			retorno.setCodStatus(Long.valueOf(1));
-			retorno.setMsg("Cadastro realizado.");
-			retorno.setModel(null);
-		} catch (SQLException e) {
-			System.out.println("Erro: " + e);
-			RetornoWS<Object> retornoE = new RetornoWS<Object>();
-			retornoE.setCodStatus(Long.valueOf(3));
-			retornoE.setMsg("Erro ao cadastrar newsletter! " + e.getMessage());
-			retornoE.setModel((Object) null);
-			e.printStackTrace();
-			return Response.ok((Object) retornoE).build();
-		}
-		System.out.println((Object) retorno);
-		return Response.ok((Object) retorno).build();
 	}
 
 	@GET
