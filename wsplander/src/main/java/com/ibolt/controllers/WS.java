@@ -25,7 +25,7 @@ import javax.ws.rs.core.Response;
 @Path(value = "/")
 public class WS {
 	@POST
-	@Path(value = "/novologin")
+	@Path(value = "/novologin2")
 	@Produces(value = { "application/json; charset=UTF-8" })
 	public Response novologin(Pedido p) {
 		if ((p.getUsr().equals("pdroqtl")) && (p.getPwd().equals("jck9com*"))) {
