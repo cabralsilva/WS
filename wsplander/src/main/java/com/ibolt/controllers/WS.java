@@ -12,6 +12,7 @@ import com.ibolt.services.LoginServices;
 import com.ibolt.services.PedidoPagamentoServices;
 import com.ibolt.services.PedidoServices;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.FormParam;
@@ -313,32 +314,36 @@ public class WS {
 	}
 
 	@POST
-	@Path(value = "/login")
+	@Path(value = "/loginPainel")
 	@Produces(value = { "application/json; charset=UTF-8" })
-	public Response login(@FormParam(value = "email") String email, @FormParam(value = "senha") String senha) {
-
-		System.out.println("User: " + email + " -- Senha: " + senha);
-		LoginServices ls = new LoginServices();
-		try {
-			ls.CreateConnection();
-		} catch (Exception e) {
-			System.out.println("Erro ao criar a conexão: " + e);
-			RetornoWS<Object> retorno = new RetornoWS<Object>();
-			retorno.setCodStatus(Long.valueOf(4));
-			retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
-			retorno.setModel((Object) null);
-			e.printStackTrace();
+	public Response loginPainel(Cliente c) {
+		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
+			LoginServices ls = new LoginServices();
+			try {
+				ls.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+			try {
+				retorno = ls.loginCliente(c.getEmail(), c.getSenhaCliente());
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			ls.CloseConnection();
+			System.out.println((Object) retorno);
 			return Response.ok((Object) retorno).build();
+		} else
+
+		{
+			return Response.status(404).build();
 		}
-		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
-		try {
-			retorno = ls.loginCliente(email, senha);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		ls.CloseConnection();
-		System.out.println((Object) retorno);
-		return Response.ok((Object) retorno).build();
 	}
 
 	@POST
@@ -982,6 +987,51 @@ public class WS {
 			}
 			System.out.println((Object) retorno);
 			return Response.ok((Object) retorno).build();
+		} else
+
+		{
+			return Response.status(404).build();
+		}
+	}
+	
+	@POST
+	@Path(value = "/listarPedidos")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response listaPedidos(Cliente c) {
+		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
+			PedidoServices ps = new PedidoServices();
+			try {
+				ps.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<List<Pedido>> retorno = new RetornoWS<List<Pedido>>();
+			try {
+				retorno = ps.getPedidosForCliente(c.getCodigoCliente());
+				if (retorno.getCodStatus() == 1) {
+					ItemPedidoServices ips = new ItemPedidoServices();
+					ips.setSttm(ps.getSttm());
+					for(Pedido p:retorno.getModel()){
+						p.setLstItems(ips.getItemsForCodigoPedido(p.getCodigoPedido()).getModel());
+						System.out.println(p);
+					}
+				}
+				ps.CloseConnection();
+				return Response.ok((Object) retorno).build();
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(4));
+				retornoE.setMsg("Erro ao buscar os pedidos!" + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
 		} else
 
 		{

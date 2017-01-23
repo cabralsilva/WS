@@ -1,10 +1,17 @@
 package com.ibolt.services;
 
+import com.ibolt.models.ItemPedido;
 import com.ibolt.models.Pedido;
 import com.ibolt.models.RetornoWS;
 import com.ibolt.services.ControlServices;
+
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PedidoServices extends ControlServices {
 	public void invalidarPedido(Pedido p, String msg) throws SQLException {
@@ -361,7 +368,7 @@ public class PedidoServices extends ControlServices {
 				+ p.getTipoFrete() + "', " + "Loja = '" + p.getLoja() + "', " + "ValorFrete = " + p.getValorFrete()
 				+ ", " + "NumeroParcelas = " + p.getNumeroParcelas() + ", " + "ValorParcelas = " + p.getValorParcelas()
 				+ ", ";
-		setFields = p.getFormaPagamento().equals("boleto")
+		setFields = p.getFormaPagamento().equals("Boleto")
 				? String.valueOf(setFields) + "DataVencimento = DATE '" + p.getDataVencimento() + "' "
 				: String.valueOf(setFields) + "CartaoTitular = '" + p.getCartaoTitular() + "', " + "CartaoNumero = '"
 						+ p.getCartaoNumero() + "', " + "CartaoValidade = '" + p.getCartaoValidade() + "', "
@@ -374,5 +381,55 @@ public class PedidoServices extends ControlServices {
 		retorno.setMsg("Pedido Atualizado com sucesso");
 		retorno.setModel(p);
 		return retorno;
+	}
+	
+	public RetornoWS<List<Pedido>> getPedidosForCliente(Long codigoCliente) throws SQLException {
+		RetornoWS<List<Pedido>> retorno = new RetornoWS<List<Pedido>>();
+		LocalDate inicio = LocalDate.now();	
+		inicio = inicio.minusMonths(12);
+		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		System.out.println(inicio);
+		String sql = "SELECT Pedido.Codigo, Pedido.Data, Pedido.ValorFrete, Pedido.ValorDesconto, Pedido.ValorFinal, Pedido.FormaPagamento, Pedido.NumeroParcelas, Pedido.EntregaBairro, Pedido.EntregaCep, Pedido.EntregaComplemento, Pedido.EntregaInformacoesReferencia, Pedido.EntregaMunicipio, Pedido.EntregaNome, Pedido.EntregaNumero, Pedido.EntregaRua, Pedido.EntregaUf FROM Pedido WHERE Pedido.CodigoCliente = "
+				+ codigoCliente + " AND ( Pedido.Status = 'Pendente' OR ( Pedido.Status <> 'Pendente' AND ( Pedido.Data >= '" + inicio.format(formatador) + "' ) ) )";
+		System.out.println(sql);
+		ResultSet rs = this.sttm.executeQuery(sql);
+		rs.last();
+		int numeroRegistros = rs.getRow();
+		rs.beforeFirst();
+		if(numeroRegistros > 0) {
+			ArrayList<Pedido> lstPedido = new ArrayList<Pedido>();
+			while (rs.next()) {
+				Pedido p = new Pedido();
+				p.setCodigoPedido(Long.valueOf(rs.getLong("Codigo")));
+				p.setData(rs.getString("Data"));
+				p.setValorFrete(rs.getString("ValorFrete"));
+				p.setValorDesconto(rs.getString("ValorDesconto"));
+				p.setValorFinal(rs.getString("ValorFinal"));
+				p.setFormaPagamento(rs.getString("FormaPagamento"));
+				p.setNumeroParcelas(rs.getString("NumeroParcelas"));
+				p.setEntregaBairro(rs.getString("EntregaBairro"));
+				p.setEntregaCep(rs.getString("EntregaCep"));
+				p.setEntregaComplemento(rs.getString("EntregaComplemento"));
+				p.setEntregaInformacoesReferencia(rs.getString("EntregaInformacoesReferencia"));
+				p.setEntregaMunicipio(rs.getString("EntregaMunicipio"));
+				p.setEntregaNome(rs.getString("EntregaNome"));
+				p.setEntregaNumero(rs.getString("EntregaNumero"));
+				p.setEntregaRua(rs.getString("EntregaRua"));
+				p.setEntregaUf(rs.getString("EntregaUf"));
+				lstPedido.add(p);
+			}
+			rs.close();
+			retorno.setCodStatus(Long.valueOf(1));
+			retorno.setMsg("Busca Realizada com Sucesso!");
+			retorno.setModel(lstPedido);
+			return retorno;
+			
+		} else {
+			rs.close();
+			retorno.setCodStatus(Long.valueOf(2));
+			retorno.setMsg("Nenhum pedido encontrado!");
+			return retorno;
+		}
 	}
 }

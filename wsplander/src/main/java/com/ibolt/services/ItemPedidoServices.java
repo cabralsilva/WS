@@ -8,8 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemPedidoServices
-extends ControlServices {
+public class ItemPedidoServices extends ControlServices {
     public void deleteAllItemsPedido(Long codigoPedido) throws SQLException {
         String sql = "DELETE FROM PedidoProdutoGrade WHERE PedidoProdutoGrade.CodigoPedido = " + codigoPedido;
         System.out.println(sql);

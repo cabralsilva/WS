@@ -12,6 +12,8 @@ public class Pedido extends AutenticacaoAcesso{
     @XmlElement
     private Long codigoPedido;
     @XmlElement
+    private String Data;
+    @XmlElement
     private String Loja;
     @XmlElement
     private String Processo;
@@ -102,6 +104,8 @@ public class Pedido extends AutenticacaoAcesso{
     @XmlElement
     private String ValorOutros;
     @XmlElement
+    private String ValorDesconto;
+    @XmlElement
     private String TipoFrete;
     @XmlElement
     private String ValorFrete;
@@ -118,6 +122,14 @@ public class Pedido extends AutenticacaoAcesso{
     @XmlElement
     private PedidoPagamento fkPagamento;
 
+    public String getData() {
+        return this.Data;
+    }
+
+    public void setData(String data) {
+        this.Data = data;
+    }
+    
     public String getSubtotal() {
         return this.Subtotal;
     }
@@ -493,13 +505,21 @@ public class Pedido extends AutenticacaoAcesso{
     public void setCartaoCodigoSeguranca(String cartaoCodigoSeguranca) {
         this.CartaoCodigoSeguranca = cartaoCodigoSeguranca;
     }
-
+    
     public String getValorOutros() {
         return this.ValorOutros;
     }
 
     public void setValorOutros(String valorOutros) {
         this.ValorOutros = valorOutros;
+    }
+    
+    public String getValorDesconto() {
+        return this.ValorDesconto;
+    }
+
+    public void setValorDesconto(String valorDesconto) {
+        this.ValorDesconto = valorDesconto;
     }
 
     public String getTipoFrete() {
@@ -551,6 +571,6 @@ public class Pedido extends AutenticacaoAcesso{
     }
 
     public String toString() {
-        return "Pedido [codigoPedido=" + this.codigoPedido + ", Loja=" + this.Loja + ", Processo=" + this.Processo + ", Editar=" + this.Editar + ", EntregaNome=" + this.EntregaNome + ", EntregaRua=" + this.EntregaRua + ", EntregaNumero=" + this.EntregaNumero + ", EntregaComplemento=" + this.EntregaComplemento + ", EntregaBairro=" + this.EntregaBairro + ", EntregaMunicipio=" + this.EntregaMunicipio + ", EntregaUf=" + this.EntregaUf + ", EntregaCep=" + this.EntregaCep + ", EntregaInformacoesReferencia=" + this.EntregaInformacoesReferencia + ", CodigoCliente=" + this.CodigoCliente + ", ClientePessoa=" + this.ClientePessoa + ", ClienteNome=" + this.ClienteNome + ", ClienteDataNascimento=" + this.ClienteDataNascimento + ", ClienteCpf=" + this.ClienteCpf + ", ClienteRg=" + this.ClienteRg + ", ClienteRazaoSocial=" + this.ClienteRazaoSocial + ", ClienteCnpj=" + this.ClienteCnpj + ", ClienteInscricaoEstadual=" + this.ClienteInscricaoEstadual + ", ClienteEmail=" + this.ClienteEmail + ", ClienteCep=" + this.ClienteCep + ", ClienteRua=" + this.ClienteRua + ", ClienteNumero=" + this.ClienteNumero + ", ClienteComplemento=" + this.ClienteComplemento + ", ClienteBairro=" + this.ClienteBairro + ", ClienteMunicipio=" + this.ClienteMunicipio + ", ClienteUf=" + this.ClienteUf + ", ClienteInformacoesReferencia=" + this.ClienteInformacoesReferencia + ", ClienteDdd1=" + this.ClienteDdd1 + ", ClienteDdd2=" + this.ClienteDdd2 + ", ClienteTelefone1=" + this.ClienteTelefone1 + ", ClienteTelefone2=" + this.ClienteTelefone2 + ", ClienteSenha=" + this.ClienteSenha + ", TransacaoIp=" + this.TransacaoIp + ", FormaPagamento=" + this.FormaPagamento + ", DataVencimento=" + this.DataVencimento + ", NumeroParcelas=" + this.NumeroParcelas + ", ValorParcelas=" + this.ValorParcelas + ", CartaoTitular=" + this.CartaoTitular + ", CartaoNumero=" + this.CartaoNumero + ", CartaoValidade=" + this.CartaoValidade + ", CartaoCodigoSeguranca=" + this.CartaoCodigoSeguranca + ", ValorOutros=" + this.ValorOutros + ", TipoFrete=" + this.TipoFrete + ", ValorFrete=" + this.ValorFrete + ", ValorFinal=" + this.ValorFinal + ", Quantidade=" + this.Quantidade + ", Subtotal=" + this.Subtotal + ", fkCliente=" + this.fkCliente + ", lstItems=" + this.lstItems + "]";
+        return "Pedido [codigoPedido=" + this.codigoPedido + ", Loja=" + this.Loja + ", Processo=" + this.Processo + ", Editar=" + this.Editar + ", EntregaNome=" + this.EntregaNome + ", EntregaRua=" + this.EntregaRua + ", EntregaNumero=" + this.EntregaNumero + ", EntregaComplemento=" + this.EntregaComplemento + ", EntregaBairro=" + this.EntregaBairro + ", EntregaMunicipio=" + this.EntregaMunicipio + ", EntregaUf=" + this.EntregaUf + ", EntregaCep=" + this.EntregaCep + ", EntregaInformacoesReferencia=" + this.EntregaInformacoesReferencia + ", CodigoCliente=" + this.CodigoCliente + ", ClientePessoa=" + this.ClientePessoa + ", ClienteNome=" + this.ClienteNome + ", ClienteDataNascimento=" + this.ClienteDataNascimento + ", ClienteCpf=" + this.ClienteCpf + ", ClienteRg=" + this.ClienteRg + ", ClienteRazaoSocial=" + this.ClienteRazaoSocial + ", ClienteCnpj=" + this.ClienteCnpj + ", ClienteInscricaoEstadual=" + this.ClienteInscricaoEstadual + ", ClienteEmail=" + this.ClienteEmail + ", ClienteCep=" + this.ClienteCep + ", ClienteRua=" + this.ClienteRua + ", ClienteNumero=" + this.ClienteNumero + ", ClienteComplemento=" + this.ClienteComplemento + ", ClienteBairro=" + this.ClienteBairro + ", ClienteMunicipio=" + this.ClienteMunicipio + ", ClienteUf=" + this.ClienteUf + ", ClienteInformacoesReferencia=" + this.ClienteInformacoesReferencia + ", ClienteDdd1=" + this.ClienteDdd1 + ", ClienteDdd2=" + this.ClienteDdd2 + ", ClienteTelefone1=" + this.ClienteTelefone1 + ", ClienteTelefone2=" + this.ClienteTelefone2 + ", ClienteSenha=" + this.ClienteSenha + ", TransacaoIp=" + this.TransacaoIp + ", FormaPagamento=" + this.FormaPagamento + ", DataVencimento=" + this.DataVencimento + ", NumeroParcelas=" + this.NumeroParcelas + ", ValorParcelas=" + this.ValorParcelas + ", CartaoTitular=" + this.CartaoTitular + ", CartaoNumero=" + this.CartaoNumero + ", CartaoValidade=" + this.CartaoValidade + ", CartaoCodigoSeguranca=" + this.CartaoCodigoSeguranca + ", ValorOutros=" + this.ValorOutros + ", TipoFrete=" + this.TipoFrete + ", ValorFrete=" + this.ValorFrete + ", ValorFinal=" + this.ValorFinal + ", Quantidade=" + this.Quantidade + ", Subtotal=" + this.Subtotal + ", fkCliente=" + this.fkCliente + ", \n\nlstItems=" + this.lstItems + "\n]";
     }
 }
