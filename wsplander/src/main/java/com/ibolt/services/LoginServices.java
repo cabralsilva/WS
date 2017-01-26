@@ -13,8 +13,9 @@ extends ControlServices {
         String sql =  "SELECT Cliente.Codigo, Cliente.Nome, Cliente.Email, Cliente.Cpf, Cliente.Rg, Cliente.Cnpj, "
         			+ "Cliente.RazaoSocial, Cliente.InscricaoEstadual, Cliente.Logradouro, Cliente.Bairro, Cliente.Numero, "
         			+ "Cliente.Complemento, Cliente.Municipio, Cliente.MunicipioCodigo, Cliente.Cep, Cliente.Uf, "
-        			+ "Cliente.Pais, Cliente.PaisCodigo, Cliente.Ddd, Cliente.Telefone, Cliente.DataNascimento, Cliente.Sexo, "
-        			+ "Cliente.DataUltimaCompra, Cliente.Pessoa FROM Cliente "
+        			+ "Cliente.Pais, Cliente.PaisCodigo, Cliente.Ddd, Cliente.Telefone, Cliente.Ddd[2] as Ddd2, "
+        			+ "Cliente.Telefone[2] as Telefone2, Cliente.DataNascimento, Cliente.Sexo, "
+        			+ "Cliente.DataUltimaCompra, Cliente.Pessoa, Cliente.InformacoesReferencia FROM Cliente "
         				+ "WHERE LOWER(Cliente.Email) = '" + email + "' AND Cliente.Senha = '" + senha + "'";
         
         
@@ -46,10 +47,13 @@ extends ControlServices {
                 c.setCodigoPaisCliente(rs.getString("PaisCodigo"));
                 c.setDdd1(rs.getString("Ddd"));
                 c.setTelefone1(rs.getString("Telefone"));
+                c.setDdd2(rs.getString("Ddd2"));
+                c.setTelefone2(rs.getString("Telefone2"));
                 c.setDataNascimento(rs.getString("DataNascimento"));
                 c.setSexoCliente(rs.getString("Sexo"));
                 c.setDataUltimaCompraCliente(rs.getString("DataUltimaCompra"));
                 c.setPessoa(Long.valueOf(rs.getLong("Pessoa")));
+                c.setInformacoesReferencia(rs.getString("InformacoesReferencia"));
                 int limite = c.getCpf() != null && c.getCpf() != "" ? c.getCpf().length() : c.getCnpj().length();
                 int i = inicio = c.getCpf() != null && c.getCpf() != "" ? 11 : 14;
                 while (i > limite) {
