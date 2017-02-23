@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class LoginServices
 extends ControlServices {
-    public RetornoWS<Cliente> loginCliente(String email, String senha) throws SQLException {
+    public RetornoWS<Cliente> loginCliente(String email, String senha, Cliente c) throws SQLException, Exception {
         RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
         String sql =  "SELECT Cliente.Codigo, Cliente.Nome, Cliente.Email, Cliente.Cpf, Cliente.Rg, Cliente.Cnpj, "
         			+ "Cliente.RazaoSocial, Cliente.InscricaoEstadual, Cliente.Logradouro, Cliente.Bairro, Cliente.Numero, "
@@ -22,10 +22,11 @@ extends ControlServices {
         rs.last();
         int numeroRegistros = rs.getRow();
         rs.beforeFirst();
+//        System.out.println("Encontrou: " + numeroRegistros);
         if (numeroRegistros == 1) {
             while (rs.next()) {
                 int inicio;
-                Cliente c = new Cliente();
+//                Cliente c = new Cliente();
                 c.setCodigoCliente(Long.valueOf(rs.getLong("Codigo")));
                 c.setNome(rs.getString("Nome"));
                 c.setEmail(rs.getString("Email"));
@@ -68,9 +69,10 @@ extends ControlServices {
                 }
                 retorno.setModel(c);
                 retorno.setCodStatus(Long.valueOf(1));
-                retorno.setMsg("Usu\u00e1rio Encontrado");
+                retorno.setMsg("Usuário Encontrado");
             }
         } else if (numeroRegistros > 1) {
+//        	System.out.println("Preparando retorno...");
             retorno.setCodStatus(Long.valueOf(2));
             retorno.setMsg("Há mais de um usuário com este email cadastrado! Contate o administrador do sistema.");
             retorno.setModel(null);
