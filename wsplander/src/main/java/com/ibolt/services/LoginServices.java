@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 public class LoginServices
 extends ControlServices {
-    public RetornoWS<Cliente> loginCliente(String email, String senha, Cliente c) throws SQLException, Exception {
+    public RetornoWS<Cliente> loginCliente(Cliente c) throws SQLException, Exception {
         RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
         String sql =  "SELECT Cliente.Codigo, Cliente.Nome, Cliente.Email, Cliente.Cpf, Cliente.Rg, Cliente.Cnpj, "
         			+ "Cliente.RazaoSocial, Cliente.InscricaoEstadual, Cliente.Logradouro, Cliente.Bairro, Cliente.Numero, "
@@ -16,7 +16,7 @@ extends ControlServices {
         			+ "Cliente.Pais, Cliente.PaisCodigo, Cliente.Ddd, Cliente.Telefone, Cliente.Ddd[2] as Ddd2, "
         			+ "Cliente.Telefone[2] as Telefone2, Cliente.DataNascimento, Cliente.Sexo, "
         			+ "Cliente.DataUltimaCompra, Cliente.Pessoa, Cliente.InformacoesReferencia FROM Cliente "
-        				+ "WHERE LOWER(Cliente.Email) = '" + email + "' AND Cliente.Senha = '" + senha + "'";
+        				+ "WHERE LOWER(Cliente.Email) = '" + c.getEmail() + "' AND Cliente.Senha = '" + c.getSenhaCliente() + "'";
         
         
         ResultSet rs = this.sttm.executeQuery(sql);
@@ -26,8 +26,6 @@ extends ControlServices {
 //        System.out.println("Encontrou: " + numeroRegistros);
         if (numeroRegistros == 1) {
             while (rs.next()) {
-                int inicio;
-//                Cliente c = new Cliente();
                 c.setCodigoCliente(Long.valueOf(rs.getLong("Codigo")));
                 c.setNome(rs.getString("Nome"));
                 c.setEmail(rs.getString("Email"));
@@ -56,7 +54,7 @@ extends ControlServices {
                 c.setPessoa(Long.valueOf(rs.getLong("Pessoa")));
                 c.setInformacoesReferencia(rs.getString("InformacoesReferencia"));
                 int limite = c.getCpf() != null && c.getCpf() != "" ? c.getCpf().length() : c.getCnpj().length();
-                int i = inicio = c.getCpf() != null && c.getCpf() != "" ? 11 : 14;
+                int i = c.getCpf() != null && c.getCpf() != "" ? 11 : 14;
                 while (i > limite) {
                     if (c.getCpf() != null && c.getCpf() != "") {
                         c.setCpf("0" + c.getCpf());
@@ -66,7 +64,7 @@ extends ControlServices {
                     --i;
                 }
                 limite = c.getCep().length();
-                i = inicio = 8;
+                i = 8;
                 while (i > limite) {
                     c.setCep("0" + c.getCep());
                     --i;

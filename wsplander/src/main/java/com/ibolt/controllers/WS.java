@@ -50,9 +50,11 @@ public class WS {
 			}
 			RetornoWS<Cliente> retornoCliente = new RetornoWS<Cliente>();
 			Cliente c = new Cliente();
+			c.setEmail(p.getFkCliente().getEmail().toLowerCase());
+			c.setSenhaCliente(p.getFkCliente().getSenhaCliente());
 			try {
 //				System.out.println("Buscando clientes...");
-				retornoCliente = ls.loginCliente(p.getFkCliente().getEmail().toLowerCase(), p.getFkCliente().getSenhaCliente(), c);
+				retornoCliente = ls.loginCliente(c);
 //				System.out.println("Buscou clientes...");
 			} catch (SQLException e2) {
 				System.out.println("Erro ao tentar logar: " + e2);
@@ -429,7 +431,7 @@ public class WS {
 			}
 			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
 			try {
-				retorno = ls.loginCliente(c.getEmail(), c.getSenhaCliente(), new Cliente());
+				retorno = ls.loginCliente(c);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			} catch (Exception e){
