@@ -29,7 +29,7 @@ public class ConnectFilemaker {
         Class.forName("com.filemaker.jdbc.Driver").newInstance();
         this.con = DriverManager.getConnection("jdbc:filemaker://localhost/PlanderX", "odbc", "odbc");
 //        this.con = DriverManager.getConnection("jdbc:filemaker://10.203.51.242/PlanderHomologacao", "site", "fmjdbc78");
-        //this.con = DriverManager.getConnection("jdbc:filemaker://10.203.51.242/Plander", "site", "fmjdbc78");
+//        this.con = DriverManager.getConnection("jdbc:filemaker://10.203.51.242/Plander", "site", "fmjdbc78");
         SQLWarning warning = null;
         warning = this.con.getWarnings();
         while (warning != null) {

@@ -125,12 +125,7 @@ public class ClienteService extends ControlServices {
 			retorno.setCodStatus(Long.valueOf(2));
 			retorno.setMsg("Nenhum registro cadastrado!");
 			retorno.setModel(null);
-		}else if (numeroRegistros > 1) {
-			retorno.setCodStatus(Long.valueOf(3));
-			retorno.setMsg("Mais de um registro com o email '" + email + "'!");
-			retorno.setModel(null);
 		}
-		
 		rs.close();
 		return retorno;
 	}
