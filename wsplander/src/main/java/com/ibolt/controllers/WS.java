@@ -38,9 +38,9 @@ public class WS {
 			RetornoWS<ItemPedido> retornoItem = new RetornoWS<ItemPedido>();
 			try {
 				ls.CreateConnection();
-//				System.out.println("Conexão criada...");
+				// System.out.println("Conexão criada...");
 			} catch (Exception e) {
-				
+
 				System.out.println("Erro ao criar a conexão: " + e);
 				RetornoWS<Object> retorno = new RetornoWS<Object>();
 				retorno.setCodStatus(Long.valueOf(4));
@@ -53,9 +53,9 @@ public class WS {
 			c.setEmail(p.getFkCliente().getEmail().toLowerCase());
 			c.setSenhaCliente(p.getFkCliente().getSenhaCliente());
 			try {
-//				System.out.println("Buscando clientes...");
+				// System.out.println("Buscando clientes...");
 				retornoCliente = ls.loginCliente(c);
-//				System.out.println("Buscou clientes...");
+				// System.out.println("Buscou clientes...");
 			} catch (SQLException e2) {
 				System.out.println("Erro ao tentar logar: " + e2);
 				RetornoWS<Object> retorno = new RetornoWS<Object>();
@@ -64,20 +64,20 @@ public class WS {
 				retorno.setModel((Object) null);
 				e2.printStackTrace();
 				return Response.ok((Object) retorno).build();
-			} catch (Exception e){
+			} catch (Exception e) {
 				System.out.println("Erro interno: " + e);
 				System.out.println("Cliente: " + c);
 				e.printStackTrace();
-				
-//				RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+
+				// RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
 				p.getFkCliente().setCodigoCliente(c.getCodigoCliente());
 				p.getFkCliente().setNome(c.getNome());
-//				p.getFkCliente().setCpf(c.getCpf());
-//				p.getFkCliente().setRg(c.getRg());
-//				p.getFkCliente().setRazaoSocial(c.getRazaoSocial());
-//				p.getFkCliente().setCnpj(c.getCnpj());
+				// p.getFkCliente().setCpf(c.getCpf());
+				// p.getFkCliente().setRg(c.getRg());
+				// p.getFkCliente().setRazaoSocial(c.getRazaoSocial());
+				// p.getFkCliente().setCnpj(c.getCnpj());
 				p.getFkCliente().setPessoa(c.getPessoa());
-//				p.getFkCliente().setDataNascimento(c.getDataNascimento());
+				// p.getFkCliente().setDataNascimento(c.getDataNascimento());
 				p.getFkCliente().setInscricaoEstadual(c.getInscricaoEstadual());
 				p.getFkCliente().setEmail(c.getEmail());
 				p.getFkCliente().setCep(c.getCep());
@@ -87,12 +87,12 @@ public class WS {
 				p.getFkCliente().setBairro(c.getBairro());
 				p.getFkCliente().setMunicipio(c.getMunicipio());
 				p.getFkCliente().setUf(c.getUf());
-//				p.getFkCliente().setDdd1(c.getDdd1());
-//				p.getFkCliente().setDdd2(c.getDdd2());
-//				p.getFkCliente().setTelefone1(c.getTelefone1());
-//				p.getFkCliente().setTelefone2(c.getTelefone2());
+				// p.getFkCliente().setDdd1(c.getDdd1());
+				// p.getFkCliente().setDdd2(c.getDdd2());
+				// p.getFkCliente().setTelefone1(c.getTelefone1());
+				// p.getFkCliente().setTelefone2(c.getTelefone2());
 				p.getFkCliente().setInformacoesReferencia(c.getInformacoesReferencia());
-				
+
 				p.setCodigoCliente(p.getFkCliente().getCodigoCliente());
 				p.setClientePessoa(p.getFkCliente().getPessoa().toString());
 				p.setEntregaNome(p.getFkCliente().getNome());
@@ -103,7 +103,7 @@ public class WS {
 				p.setEntregaMunicipio(p.getFkCliente().getMunicipio());
 				p.setEntregaUf(p.getFkCliente().getUf());
 				p.setEntregaCep(p.getFkCliente().getCep());
-				
+
 				PedidoServices ps = new PedidoServices();
 				ps.setSttm(ls.getSttm());
 				RetornoWS<Pedido> retornoPedido = new RetornoWS<Pedido>();
@@ -148,12 +148,13 @@ public class WS {
 					retorno.setModel((Object) null);
 					return Response.ok((Object) retorno).build();
 				}
-				
-//				retorno.setCodStatus(Long.valueOf(3));
-//				retorno.setMsg("Seu cadastro está incompleto, complete as informações na próxima tela");
-//				retorno.setModel(p);
-//				System.out.println("\n\nRetornoss: " + retorno);
-//				return Response.ok((Object) retorno).build();
+
+				// retorno.setCodStatus(Long.valueOf(3));
+				// retorno.setMsg("Seu cadastro está incompleto, complete as
+				// informações na próxima tela");
+				// retorno.setModel(p);
+				// System.out.println("\n\nRetornoss: " + retorno);
+				// return Response.ok((Object) retorno).build();
 			}
 			if (retornoCliente.getCodStatus() == 1) {
 				p.getFkCliente().setCodigoCliente(((Cliente) retornoCliente.getModel()).getCodigoCliente());
@@ -233,7 +234,7 @@ public class WS {
 				}
 			}
 			ls.CloseConnection();
-			
+
 			return Response.ok((Object) retornoCliente).build();
 		} else {
 			new Email().send(request);
@@ -349,7 +350,7 @@ public class WS {
 				retorno.setModel((Object) null);
 				return Response.ok((Object) retorno).build();
 			}
-		} else{
+		} else {
 			new Email().send(request);
 			return Response.status(404).build();
 		}
@@ -406,7 +407,7 @@ public class WS {
 				retorno.setModel((Object) null);
 				return Response.ok((Object) retorno).build();
 			}
-		} else{
+		} else {
 			new Email().send(request);
 			return Response.status(404).build();
 		}
@@ -429,20 +430,67 @@ public class WS {
 				e.printStackTrace();
 				return Response.ok((Object) retorno).build();
 			}
-			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+			
+			//AUTENTICAÇÃO
+			RetornoWS<Cliente> retornoCliente = new RetornoWS<Cliente>();
 			try {
-				retorno = ls.loginCliente(c);
+				retornoCliente = ls.loginCliente(c);
+				if(retornoCliente.getCodStatus() == 2L){
+					ls.CloseConnection();
+					RetornoWS<Object> ret = new RetornoWS<Object>();
+					ret.setCodStatus(Long.valueOf(2));
+					ret.setMsg("Usuário/senha inválidos ou incorretos: ");
+					ret.setModel((Object) null);
+					return Response.ok((Object) ret).build();
+				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-			} catch (Exception e){
+				ls.CloseConnection();
+				RetornoWS<Object> ret = new RetornoWS<Object>();
+				ret.setCodStatus(Long.valueOf(4));
+				ret.setMsg("Erro interno no Servidor: " + e.getMessage());
+				ret.setModel((Object) null);
+				return Response.ok((Object) ret).build();
+			} catch (Exception e) {
 				e.printStackTrace();
+				ls.CloseConnection();
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(-1));
+				retornoE.setMsg("Erro interno no Servidor: " + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
 			}
-			ls.CloseConnection();
-			System.out.println((Object) retorno);
-			return Response.ok((Object) retorno).build();
-		} else
+			
+			
+			//GET PEDIDOS
+			PedidoServices ps = new PedidoServices();
+			ps.setSttm(ls.getSttm());
+			RetornoWS<List<Pedido>> retornoPedidos = new RetornoWS<List<Pedido>>();
+			try {
+				retornoPedidos = ps.getPedidosForCliente(retornoCliente.getModel().getCodigoCliente());
+				if (retornoPedidos.getCodStatus() == 1) {
+					ItemPedidoServices ips = new ItemPedidoServices();
+					ips.setSttm(ps.getSttm());
+					for (Pedido p : retornoPedidos.getModel()) {
+						p.setFkCliente(retornoCliente.getModel());
+						p.setLstItems(ips.getItemsForCodigoPedido(p.getCodigoPedido()).getModel());
+					}
+				}
 
-		{
+				ls.CloseConnection();
+				return Response.ok((Object) retornoPedidos).build();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				ls.CloseConnection();
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(-1));
+				retornoE.setMsg("Erro ao buscar os pedidos: " + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
+			//
+			
+		} else {
 			new Email().send(request);
 			return Response.status(404).build();
 		}
@@ -534,7 +582,8 @@ public class WS {
 	@GET
 	@Path(value = "/getPedidoCodigo")
 	@Produces(value = { "application/json; charset=UTF-8" })
-	public Response getPedido(@QueryParam(value = "id") Long codigo, @Context HttpServletRequest request) throws InterruptedException {
+	public Response getPedido(@QueryParam(value = "id") Long codigo, @Context HttpServletRequest request)
+			throws InterruptedException {
 		System.out.println("BUSCAR PEDIDO POR CODIGO Pedido: " + codigo);
 		PedidoServices ps = new PedidoServices();
 		try {
@@ -1149,9 +1198,7 @@ public class WS {
 				retornoE.setModel((Object) null);
 				return Response.ok((Object) retornoE).build();
 			}
-		} else
-
-		{
+		} else {
 			new Email().send(request);
 			return Response.status(404).build();
 		}

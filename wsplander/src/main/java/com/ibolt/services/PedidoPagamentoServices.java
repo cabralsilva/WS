@@ -10,6 +10,11 @@ import java.sql.SQLException;
 public class PedidoPagamentoServices extends ControlServices {
 	public RetornoWS<PedidoPagamento> insertPedidoPagamento(PedidoPagamento pp) throws SQLException {
 		RetornoWS<PedidoPagamento> retorno = new RetornoWS<PedidoPagamento>();
+		try {
+			removeCaracteres(pp);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		String sql = "INSERT INTO PedidoPagamento(CodigoPedido,CodigoFormaPagamento,Data,Parcelas,Valor)VALUES("
 				+ pp.getCodigoPedido() + "," + pp.getCodigoFormaPagamento() + ",DATE '" + pp.getData() + "'" + ","
 				+ pp.getParcelas() + "," + pp.getValor() + ")";

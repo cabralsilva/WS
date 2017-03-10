@@ -17,12 +17,17 @@ public class ItemPedidoServices extends ControlServices {
 
     public RetornoWS<ItemPedido> insertItemPedido(ItemPedido ip) throws SQLException {
         RetornoWS<ItemPedido> retorno = new RetornoWS<ItemPedido>();
+        try {
+			removeCaracteres(ip);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
         String sql = "INSERT INTO PedidoProdutoGrade(CodigoPedido,CodigoProdutoGrade,Quantidade,ValorUnitario)VALUES(" + ip.getCodigoPedido() + ",'" + ip.getCodigoProdutoGrade() + "'" + "," + ip.getQuantidade() + "," + ip.getValorUnitario() + ")";
         System.out.println(sql);
         this.sttm.execute(sql, 1);
         ResultSet rs = this.sttm.getGeneratedKeys();
         while (rs.next()) {
-            System.out.println("C\u00f3digo gerado: " + rs.getLong(1));
+            System.out.println("Código gerado: " + rs.getLong(1));
             ip.setCodigo(Long.valueOf(rs.getLong(1)));
             retorno.setCodStatus(Long.valueOf(1));
             retorno.setMsg("Item do Pedido inserido com sucesso");

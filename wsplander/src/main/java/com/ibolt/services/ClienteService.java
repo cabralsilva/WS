@@ -14,6 +14,11 @@ public class ClienteService extends ControlServices {
 
 	public RetornoWS<Cliente> updateCliente(Cliente c) throws SQLException {
 		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+		try {
+			removeCaracteres(c);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		String sql = "UPDATE Cliente SET \tNome = "
 				+ (c.getNome() == null ? null : new StringBuilder("'").append(c.getNome()).append("'").toString())
 				+ ", DataNascimento = "
@@ -43,6 +48,11 @@ public class ClienteService extends ControlServices {
 
 	public RetornoWS<Cliente> updateSenhaCliente(Cliente c) throws SQLException {
 		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+		try {
+			removeCaracteres(c);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		String sql = "UPDATE Cliente SET \tSenha = '" + c.getSenhaCliente() + "'" + " WHERE " + "Cliente.Codigo = "
 				+ c.getCodigoCliente();
 		System.out.println(sql);
@@ -84,7 +94,7 @@ public class ClienteService extends ControlServices {
 				+ "Cliente.Cep, Cliente.Uf, Cliente.Pais, Cliente.Ddd, Cliente.Telefone, Cliente.DataNascimento, Cliente.Sexo, "
 				+ "Cliente.DataUltimaCompra, Cliente.Pessoa, Cliente.Ddd, Cliente.Telefone, Cliente.Senha, Cliente.InformacoesReferencia, "
 				+ "Cliente.Ddd[2] AS Ddd2, Cliente.Telefone[2] AS Telefone2 FROM Cliente "
-				+ "WHERE LOWER(Cliente.Email) = '" + email + "'";
+				+ "WHERE LOWER(Cliente.Email) = '" + email + "' ORDER BY Cliente.Codigo ASC FETCH FIRST 1 ROW ONLY";
 		System.out.println(sql);
 		ResultSet rs = this.sttm.executeQuery(sql);
 		rs.last();
@@ -139,7 +149,7 @@ public class ClienteService extends ControlServices {
 		int numeroRegistros = rs.getRow();
 		if (numeroRegistros >= 1) {
 			retorno.setCodStatus(Long.valueOf(2));
-			retorno.setMsg("J\u00e1 existe um usu\u00e1rio cadastrado com esse e-mail.");
+			retorno.setMsg("Já existe um usuário cadastrado com esse e-mail.");
 			retorno.setModel(null);
 		} else {
 			retorno.setCodStatus(Long.valueOf(1));

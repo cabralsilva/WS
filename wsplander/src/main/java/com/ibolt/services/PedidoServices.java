@@ -1,11 +1,9 @@
 package com.ibolt.services;
 
-import com.ibolt.models.ItemPedido;
 import com.ibolt.models.Pedido;
 import com.ibolt.models.RetornoWS;
 import com.ibolt.services.ControlServices;
 
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -15,6 +13,7 @@ import java.util.List;
 
 public class PedidoServices extends ControlServices {
 	public void invalidarPedido(Pedido p, String msg) throws SQLException {
+		
 		String sql = "UPDATE Pedido SET Processo = 'Falha de Comunicação', LogWebService = '" + msg + "' " + "WHERE "
 				+ "Pedido.Codigo = " + p.getCodigoPedido();
 		System.out.println(sql);
@@ -23,6 +22,13 @@ public class PedidoServices extends ControlServices {
 
 	public RetornoWS<Pedido> insertPedidoClienteNovo(Pedido p) throws SQLException {
 		RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+		
+		try {
+			removeCaracteres(p);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
 		String columns = "CodigoCliente, Loja, Processo, Editar, ClientePessoa, EntregaNome, EntregaRua, EntregaNumero, EntregaComplemento, EntregaBairro, EntregaMunicipio, EntregaUf, EntregaCep, EntregaInformacoesReferencia, ClienteNome, ClienteDataNascimento, ClienteCpf, ClienteRg, ClienteRazaoSocial, ClienteCnpj, ClienteInscricaoEstadual, ClienteEmail, ClienteCep, ClienteRua, ClienteNumero, ClienteComplemento, ClienteBairro, ClienteMunicipio, ClienteUf, ClienteInformacoesReferencia, ClienteDdd[1], ClienteTelefone[1], ClienteDdd[2], ClienteTelefone[2], ClienteSenha";
 		String values = p.getCodigoCliente() + ", '" + p.getLoja() + "', '" + p.getProcesso() + "', '" + p.getEditar()
 				+ "', '" + p.getClientePessoa() + "', '"
@@ -112,6 +118,13 @@ public class PedidoServices extends ControlServices {
 
 	public RetornoWS<Pedido> insertPedido(Pedido p) throws SQLException {
 		RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+		try {
+			removeCaracteres(p);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
+		
 		String columns = "CodigoCliente, Loja, Processo, Editar, ClientePessoa, EntregaNome, EntregaRua, EntregaNumero, EntregaComplemento, EntregaBairro, EntregaMunicipio, EntregaUf, EntregaCep, EntregaInformacoesReferencia, ClienteNome, ClienteDataNascimento, ClienteCpf, ClienteRg, ClienteRazaoSocial, ClienteCnpj, ClienteInscricaoEstadual, ClienteEmail, ClienteCep, ClienteRua, ClienteNumero, ClienteComplemento, ClienteBairro, ClienteMunicipio, ClienteUf, ClienteInformacoesReferencia, ClienteDdd[1], ClienteTelefone[1], ClienteDdd[2], ClienteTelefone[2], ClienteSenha";
 		String values = p.getCodigoCliente() + ", '" + p.getLoja() + "', '" + p.getProcesso() + "', '" + p.getEditar()
 				+ "', '" + p.getClientePessoa() + "', '" + p.getEntregaNome() + "', '" + p.getEntregaRua() + "', '"
@@ -300,6 +313,13 @@ public class PedidoServices extends ControlServices {
 
 	public RetornoWS<Pedido> updateDelivey(Pedido p) throws SQLException {
 		RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+		
+		try {
+			removeCaracteres(p);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
 		String sql = "UPDATE Pedido SET EntregaNome = '" + p.getEntregaNome() + "', " + "EntregaCep = '"
 				+ p.getEntregaCep() + "', " + "EntregaRua = '" + p.getEntregaRua() + "', " + "EntregaNumero = '"
 				+ p.getEntregaNumero() + "', " + "EntregaComplemento = '" + p.getEntregaComplemento() + "', "
@@ -316,6 +336,11 @@ public class PedidoServices extends ControlServices {
 
 	public RetornoWS<Pedido> updateClienteNovo(Pedido p) throws SQLException {
 		RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+		try {
+			removeCaracteres(p);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
 		String sql = "UPDATE Pedido SET ClienteNome = "
 				+ (p.getClienteNome() == null ? new StringBuilder().append((Object) null).append(", ").toString()
 						: new StringBuilder("'").append(p.getClienteNome()).append("', ").toString())
@@ -352,13 +377,21 @@ public class PedidoServices extends ControlServices {
 		System.out.println(sql);
 		this.sttm.execute(sql);
 		retorno.setCodStatus(Long.valueOf(1));
-		retorno.setMsg("Informa\u00e7\u00f5es do cliente novo alterado com sucesso");
+		retorno.setMsg("Informações do cliente novo alterado com sucesso");
 		retorno.setModel(p);
 		return retorno;
 	}
 
+	
 	public RetornoWS<Pedido> updatePedidoFinalizacao(Pedido p) throws SQLException {
 		RetornoWS<Pedido> retorno = new RetornoWS<Pedido>();
+		try {
+			removeCaracteres(p);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+
+		
 		String setFields = " EntregaNome = '" + p.getEntregaNome() + "', " + "EntregaCep = '" + p.getEntregaCep()
 				+ "', " + "EntregaRua = '" + p.getEntregaRua() + "', " + "EntregaNumero = '" + p.getEntregaNumero()
 				+ "', " + "EntregaComplemento = '" + p.getEntregaComplemento() + "', " + "EntregaBairro = '"
@@ -382,22 +415,24 @@ public class PedidoServices extends ControlServices {
 		retorno.setModel(p);
 		return retorno;
 	}
-	
+
 	public RetornoWS<List<Pedido>> getPedidosForCliente(Long codigoCliente) throws SQLException {
 		RetornoWS<List<Pedido>> retorno = new RetornoWS<List<Pedido>>();
-		LocalDate inicio = LocalDate.now();	
+		LocalDate inicio = LocalDate.now();
 		inicio = inicio.minusMonths(12);
 		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-		System.out.println(inicio);
+		// System.out.println(inicio);
 		String sql = "SELECT Pedido.Codigo, Pedido.Data, Pedido.ValorFrete, Pedido.ValorDesconto, Pedido.ValorFinal, Pedido.FormaPagamento, Pedido.NumeroParcelas, Pedido.EntregaBairro, Pedido.EntregaCep, Pedido.EntregaComplemento, Pedido.EntregaInformacoesReferencia, Pedido.EntregaMunicipio, Pedido.EntregaNome, Pedido.EntregaNumero, Pedido.EntregaRua, Pedido.EntregaUf FROM Pedido WHERE Pedido.CodigoCliente = "
-				+ codigoCliente + " AND ( Pedido.Status = 'Pendente' OR ( Pedido.Status <> 'Pendente' AND ( Pedido.Data >= '" + inicio.format(formatador) + "' ) ) )";
-		System.out.println(sql);
+				+ codigoCliente
+				+ " AND ( Pedido.Status = 'Pendente' OR ( Pedido.Status <> 'Pendente' AND ( Pedido.Data >= '"
+				+ inicio.format(formatador) + "' ) ) )";
+		// System.out.println(sql);
 		ResultSet rs = this.sttm.executeQuery(sql);
 		rs.last();
 		int numeroRegistros = rs.getRow();
 		rs.beforeFirst();
-		if(numeroRegistros > 0) {
+		if (numeroRegistros > 0) {
 			ArrayList<Pedido> lstPedido = new ArrayList<Pedido>();
 			while (rs.next()) {
 				Pedido p = new Pedido();
@@ -424,7 +459,7 @@ public class PedidoServices extends ControlServices {
 			retorno.setMsg("Busca Realizada com Sucesso!");
 			retorno.setModel(lstPedido);
 			return retorno;
-			
+
 		} else {
 			rs.close();
 			retorno.setCodStatus(Long.valueOf(2));
