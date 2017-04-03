@@ -112,6 +112,8 @@ public class Pedido extends AutenticacaoAcesso{
     @XmlElement
     private String ValorFinal;
     @XmlElement
+    private String Rastreador;
+    @XmlElement
     private Long Quantidade;
     @XmlElement
     private String Subtotal;
@@ -130,7 +132,15 @@ public class Pedido extends AutenticacaoAcesso{
         this.Data = data;
     }
     
-    public String getSubtotal() {
+    public String getRastreador() {
+		return Rastreador;
+	}
+
+	public void setRastreador(String rastreador) {
+		Rastreador = rastreador;
+	}
+
+	public String getSubtotal() {
         return this.Subtotal;
     }
 
@@ -570,7 +580,25 @@ public class Pedido extends AutenticacaoAcesso{
         this.fkPagamento = fkPagamento;
     }
 
-    public String toString() {
-        return "Pedido [codigoPedido=" + this.codigoPedido + ", Loja=" + this.Loja + ", Processo=" + this.Processo + ", Editar=" + this.Editar + ", EntregaNome=" + this.EntregaNome + ", EntregaRua=" + this.EntregaRua + ", EntregaNumero=" + this.EntregaNumero + ", EntregaComplemento=" + this.EntregaComplemento + ", EntregaBairro=" + this.EntregaBairro + ", EntregaMunicipio=" + this.EntregaMunicipio + ", EntregaUf=" + this.EntregaUf + ", EntregaCep=" + this.EntregaCep + ", EntregaInformacoesReferencia=" + this.EntregaInformacoesReferencia + ", CodigoCliente=" + this.CodigoCliente + ", ClientePessoa=" + this.ClientePessoa + ", ClienteNome=" + this.ClienteNome + ", ClienteDataNascimento=" + this.ClienteDataNascimento + ", ClienteCpf=" + this.ClienteCpf + ", ClienteRg=" + this.ClienteRg + ", ClienteRazaoSocial=" + this.ClienteRazaoSocial + ", ClienteCnpj=" + this.ClienteCnpj + ", ClienteInscricaoEstadual=" + this.ClienteInscricaoEstadual + ", ClienteEmail=" + this.ClienteEmail + ", ClienteCep=" + this.ClienteCep + ", ClienteRua=" + this.ClienteRua + ", ClienteNumero=" + this.ClienteNumero + ", ClienteComplemento=" + this.ClienteComplemento + ", ClienteBairro=" + this.ClienteBairro + ", ClienteMunicipio=" + this.ClienteMunicipio + ", ClienteUf=" + this.ClienteUf + ", ClienteInformacoesReferencia=" + this.ClienteInformacoesReferencia + ", ClienteDdd1=" + this.ClienteDdd1 + ", ClienteDdd2=" + this.ClienteDdd2 + ", ClienteTelefone1=" + this.ClienteTelefone1 + ", ClienteTelefone2=" + this.ClienteTelefone2 + ", ClienteSenha=" + this.ClienteSenha + ", TransacaoIp=" + this.TransacaoIp + ", FormaPagamento=" + this.FormaPagamento + ", DataVencimento=" + this.DataVencimento + ", NumeroParcelas=" + this.NumeroParcelas + ", ValorParcelas=" + this.ValorParcelas + ", CartaoTitular=" + this.CartaoTitular + ", CartaoNumero=" + this.CartaoNumero + ", CartaoValidade=" + this.CartaoValidade + ", CartaoCodigoSeguranca=" + this.CartaoCodigoSeguranca + ", ValorOutros=" + this.ValorOutros + ", TipoFrete=" + this.TipoFrete + ", ValorFrete=" + this.ValorFrete + ", ValorFinal=" + this.ValorFinal + ", Quantidade=" + this.Quantidade + ", Subtotal=" + this.Subtotal + ", fkCliente=" + this.fkCliente + ", \n\nlstItems=" + this.lstItems + "\n]";
-    }
+    @Override
+	public String toString() {
+		return "Pedido [codigoPedido=" + codigoPedido + ", Data=" + Data + ", EntregaNome=" + EntregaNome
+				+ ", EntregaRua=" + EntregaRua + ", EntregaNumero=" + EntregaNumero + ", EntregaComplemento="
+				+ EntregaComplemento + ", EntregaBairro=" + EntregaBairro + ", EntregaMunicipio=" + EntregaMunicipio
+				+ ", EntregaUf=" + EntregaUf + ", EntregaCep=" + EntregaCep + ", EntregaInformacoesReferencia="
+				+ EntregaInformacoesReferencia + ", CodigoCliente=" + CodigoCliente + ", ClientePessoa=" + ClientePessoa
+				+ ", ClienteNome=" + ClienteNome + ", ClienteDataNascimento=" + ClienteDataNascimento + ", ClienteCpf="
+				+ ClienteCpf + ", ClienteRg=" + ClienteRg + ", ClienteRazaoSocial=" + ClienteRazaoSocial
+				+ ", ClienteCnpj=" + ClienteCnpj + ", ClienteInscricaoEstadual=" + ClienteInscricaoEstadual
+				+ ", ClienteEmail=" + ClienteEmail + ", ClienteCep=" + ClienteCep + ", ClienteRua=" + ClienteRua
+				+ ", ClienteNumero=" + ClienteNumero + ", ClienteComplemento=" + ClienteComplemento + ", ClienteBairro="
+				+ ClienteBairro + ", ClienteMunicipio=" + ClienteMunicipio + ", ClienteUf=" + ClienteUf
+				+ ", ClienteInformacoesReferencia=" + ClienteInformacoesReferencia + ", ClienteDdd1=" + ClienteDdd1
+				+ ", ClienteDdd2=" + ClienteDdd2 + ", ClienteTelefone1=" + ClienteTelefone1 + ", ClienteTelefone2="
+				+ ClienteTelefone2 + ", ClienteSenha=" + ClienteSenha + ", FormaPagamento=" + FormaPagamento
+				+ ", DataVencimento=" + DataVencimento + ", NumeroParcelas=" + NumeroParcelas + ", ValorOutros="
+				+ ValorOutros + ", ValorDesconto=" + ValorDesconto + ", TipoFrete=" + TipoFrete + ", ValorFrete="
+				+ ValorFrete + ", ValorFinal=" + ValorFinal + ", Rastreador=" + Rastreador + ", Quantidade="
+				+ Quantidade + ", Subtotal=" + Subtotal + ", fkCliente=" + fkCliente + "]";
+	}
 }

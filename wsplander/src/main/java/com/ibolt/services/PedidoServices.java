@@ -112,6 +112,7 @@ public class PedidoServices extends ControlServices {
 			retorno.setMsg("Pedido inserido com sucesso");
 			retorno.setModel(p);
 		}
+		System.out.println("Retorno: " + retorno.getModel());
 		rs.close();
 		return retorno;
 	}
@@ -423,11 +424,14 @@ public class PedidoServices extends ControlServices {
 		DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 		// System.out.println(inicio);
-		String sql = "SELECT Pedido.Codigo, Pedido.Data, Pedido.ValorFrete, Pedido.ValorDesconto, Pedido.ValorFinal, Pedido.FormaPagamento, Pedido.NumeroParcelas, Pedido.EntregaBairro, Pedido.EntregaCep, Pedido.EntregaComplemento, Pedido.EntregaInformacoesReferencia, Pedido.EntregaMunicipio, Pedido.EntregaNome, Pedido.EntregaNumero, Pedido.EntregaRua, Pedido.EntregaUf FROM Pedido WHERE Pedido.CodigoCliente = "
+		String sql = "SELECT Pedido.Codigo, Pedido.Data, Pedido.ValorFrete, Pedido.ValorDesconto, Pedido.ValorFinal, Pedido.FormaPagamento, Pedido.NumeroParcelas, "
+				+ "Pedido.EntregaBairro, Pedido.EntregaCep, Pedido.EntregaComplemento, Pedido.EntregaInformacoesReferencia, Pedido.EntregaMunicipio, Pedido.EntregaNome, "
+				+ "Pedido.EntregaNumero, Pedido.EntregaRua, Pedido.EntregaUf, Pedido.Rastreador, Pedido.TipoFrete, Pedido.Processo FROM Pedido WHERE Pedido.CodigoCliente = "
 				+ codigoCliente
+				+ " AND (Pedido.Processo <> 'Carrinho abandonado' OR Pedido.Processo is null) "
 				+ " AND ( Pedido.Status = 'Pendente' OR ( Pedido.Status <> 'Pendente' AND ( Pedido.Data >= '"
-				+ inicio.format(formatador) + "' ) ) )";
-		// System.out.println(sql);
+				+ inicio.format(formatador) + "' ) ) ) ORDER BY Pedido.Codigo DESC";
+		 System.out.println(sql);
 		ResultSet rs = this.sttm.executeQuery(sql);
 		rs.last();
 		int numeroRegistros = rs.getRow();
@@ -452,8 +456,12 @@ public class PedidoServices extends ControlServices {
 				p.setEntregaNumero(rs.getString("EntregaNumero"));
 				p.setEntregaRua(rs.getString("EntregaRua"));
 				p.setEntregaUf(rs.getString("EntregaUf"));
+				p.setRastreador(rs.getString("Rastreador"));
+				p.setTipoFrete(rs.getString("TipoFrete"));
+				p.setProcesso(rs.getString("Processo"));
 				lstPedido.add(p);
 			}
+			System.out.println(lstPedido);
 			rs.close();
 			retorno.setCodStatus(Long.valueOf(1));
 			retorno.setMsg("Busca Realizada com Sucesso!");
@@ -462,7 +470,7 @@ public class PedidoServices extends ControlServices {
 
 		} else {
 			rs.close();
-			retorno.setCodStatus(Long.valueOf(2));
+			retorno.setCodStatus(Long.valueOf(3));
 			retorno.setMsg("Nenhum pedido encontrado!");
 			return retorno;
 		}

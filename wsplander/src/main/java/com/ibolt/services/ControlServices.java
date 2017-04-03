@@ -70,8 +70,11 @@ public class ControlServices {
 	        		}
 	        		for (Integer pos : Lists.reverse(lstP)) {
 	        			string = string.substring(0, pos) + "''" + string.substring(pos);//p.setEntregaRua(p.getEntregaRua().substring(0, pos) + "''" + p.getEntregaRua().substring(pos));
+	        			
 	        		}
 	        		lstP.clear();
+	        		
+	        		string = string.replaceAll("🏠", "");
 	        		
 	        		campo.set(obj, string);
         		}

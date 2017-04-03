@@ -1,14 +1,52 @@
 package com.ibolt.services;
 
 import com.ibolt.models.Cliente;
+import com.ibolt.models.Pedido;
 import com.ibolt.models.RetornoWS;
 import com.ibolt.services.ControlServices;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class ClienteService extends ControlServices {
-	public RetornoWS<Cliente> insertCliente(Cliente c) {
+	public RetornoWS<Cliente> insertCliente(Cliente c) throws SQLException {
 		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+		
+		try {
+			removeCaracteres(c);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		
+		String columns = "Nome, DataNascimento, Cpf, Rg, RazaoSocial, Cnpj, InscricaoEstadual, Email, "
+				+ "Ddd, Telefone, Ddd[2], Telefone[2], Cep, Logradouro, Numero, Complemento, "
+				+ "Bairro, Municipio, Uf, InformacoesReferencia, Senha";
+		
+		String values = (c.getNome() != null ? "'" + c.getNome() + "'" : "null");
+		values += (c.getDataNascimento() != null ? ", DATE '" + c.getDataNascimento() + "'" : ", null");
+		values += (c.getCpf() != null ? ", " + c.getCpf() + "" : ", null");
+		values += (c.getRg() != null ? ", '" + c.getRg() + "'" : ", null");
+		values += (c.getRazaoSocial() != null ? ", '" + c.getRazaoSocial() + "'" : ", null");
+		values += (c.getCnpj() != null ? ", " + c.getCnpj() + "" : ", null");
+		values += (c.getInscricaoEstadual() != null ? ", '" + c.getInscricaoEstadual() + "'" : ", null");
+		values += ", '" + c.getEmail() + "', '" + c.getDdd1() + "', '" + c.getTelefone1() + "', '" + c.getDdd2() + "', '" + c.getTelefone2() + "'" ;
+		
+		values += ", " + c.getCep() + ", '" + c.getLogradouro() + "', '" + c.getNumero() + "'";
+		values += (c.getComplemento() != null ? ", '" + c.getComplemento() + "'" : ", null");
+		values += ", '" + c.getBairro() + "', '" + c.getMunicipio() + "', '" + c.getUf() + "'";
+		values += (c.getInformacoesReferencia() != null ? ", '" + c.getInformacoesReferencia() + "'" : ", null");
+		values += ", '" + c.getSenhaCliente() + "'";
+		String sql = "INSERT INTO Cliente (" + columns + ") values (" + values + ")";
+		System.out.println(sql);
+		
+		this.sttm.execute(sql, 1);
+		ResultSet rs = this.sttm.getGeneratedKeys();
+		while (rs.next()) {
+			c.setCodigoCliente(Long.valueOf(rs.getLong(1)));
+			retorno.setCodStatus(Long.valueOf(1));
+			retorno.setMsg("Cliente inserido com sucesso");
+			retorno.setModel(c);
+		}
+		rs.close();
 		return retorno;
 	}
 
@@ -22,8 +60,7 @@ public class ClienteService extends ControlServices {
 		String sql = "UPDATE Cliente SET \tNome = "
 				+ (c.getNome() == null ? null : new StringBuilder("'").append(c.getNome()).append("'").toString())
 				+ ", DataNascimento = "
-				+ (c.getDataNascimento() != null
-						? new StringBuilder("DATE '").append(c.getDataNascimento()).append("'").toString() : null)
+				+ (c.getDataNascimento() != null ? new StringBuilder("DATE '").append(c.getDataNascimento()).append("'").toString() : null)
 				+ ", Cpf = " + c.getCpf() + ", Rg = "
 				+ (c.getRg() == null ? null : new StringBuilder("'").append(c.getRg()).append("'").toString())
 				+ ", RazaoSocial = "
@@ -61,6 +98,33 @@ public class ClienteService extends ControlServices {
 		retorno.setMsg("Senha Alterada com sucesso!");
 		retorno.setModel(c);
 		return retorno;
+	}
+	
+	public RetornoWS<Cliente> verifySenhaCliente(Cliente c) throws SQLException {
+		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+		try {
+			removeCaracteres(c);
+		} catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		String sql = "SELECT Cliente.Codigo, Cliente.Senha FROM Cliente "
+				+ "WHERE Cliente.Codigo = " + c.getCodigoCliente() + " AND Cliente.Senha = '" + c.getSenhaCliente() + "'";
+		
+		ResultSet rs = this.sttm.executeQuery(sql);
+		rs.last();
+		int numeroRegistros = rs.getRow();
+		if (numeroRegistros == 0) {
+			retorno.setCodStatus(Long.valueOf(2));
+			retorno.setMsg("Senha atual incorreta.");
+			retorno.setModel(null);
+		} else {
+			retorno.setCodStatus(Long.valueOf(1));
+			retorno.setMsg("Autenticação válida!");
+			retorno.setModel(null);
+		}
+		rs.close();
+		return retorno;
+		
 	}
 
 	public RetornoWS<Cliente> getClienteForCodigo(Long codigo) throws SQLException {
@@ -127,6 +191,33 @@ public class ClienteService extends ControlServices {
 				c.setDataUltimaCompraCliente(rs.getString("DataUltimaCompra"));
 				c.setSenhaCliente(rs.getString("Senha"));
 				c.setPessoa(Long.valueOf(rs.getLong("Pessoa")));
+				retorno.setCodStatus(Long.valueOf(1));
+				retorno.setMsg("Email Já Cadastrado!");
+				retorno.setModel(c);
+			}
+		} else if (numeroRegistros < 1) {
+			retorno.setCodStatus(Long.valueOf(2));
+			retorno.setMsg("Nenhum registro cadastrado!");
+			retorno.setModel(null);
+		}
+		rs.close();
+		return retorno;
+	}
+	
+	public RetornoWS<Cliente> searchEmailSimple(String email) throws SQLException {
+		RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+		Cliente c = new Cliente();
+		String sql = "SELECT Cliente.Codigo FROM Cliente "
+				+ "WHERE LOWER(Cliente.Email) = '" + email + "' ORDER BY Cliente.Codigo ASC FETCH FIRST 1 ROW ONLY";
+		System.out.println(sql);
+		ResultSet rs = this.sttm.executeQuery(sql);
+		rs.last();
+		int numeroRegistros = rs.getRow();
+		rs.beforeFirst();
+		if (numeroRegistros == 1) {
+			while (rs.next()) {
+				c.setCodigoCliente(Long.valueOf(rs.getLong("Codigo")));
+				
 				retorno.setCodStatus(Long.valueOf(1));
 				retorno.setMsg("Email Já Cadastrado!");
 				retorno.setModel(c);

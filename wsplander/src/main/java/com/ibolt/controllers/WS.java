@@ -14,6 +14,7 @@ import com.ibolt.services.PedidoServices;
 import com.ibolt.util.Email;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
@@ -242,6 +243,202 @@ public class WS {
 		}
 
 	}
+	
+	@POST
+	@Path(value = "/loginByIdCliente")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response loginByIdCliente(Pedido p, @Context HttpServletRequest request) {
+		if ((p.getUsr().equals("pdroqtl")) && (p.getPwd().equals("jck9com*"))) {
+			System.out.println("Pedido: " + (Object) p);
+			LoginServices ls = new LoginServices();
+			ItemPedidoServices ips = new ItemPedidoServices();
+			RetornoWS<ItemPedido> retornoItem = new RetornoWS<ItemPedido>();
+			try {
+				ls.CreateConnection();
+			} catch (Exception e) {
+
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados! " + e.getMessage());
+				retorno.setModel((Object) null);
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retornoCliente = new RetornoWS<Cliente>();
+			Cliente c = new Cliente();
+			c.setCodigoCliente(p.getFkCliente().getCodigoCliente());
+			try {
+				retornoCliente = ls.loginClienteByIdCliente(c);
+			} catch (SQLException e2) {
+				System.out.println("Erro ao tentar logar: " + e2);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados! " + e2.getMessage());
+				retorno.setModel((Object) null);
+				e2.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			} catch (Exception e) {
+				System.out.println("Erro interno: " + e);
+				System.out.println("Cliente: " + c);
+				e.printStackTrace();
+
+				p.getFkCliente().setCodigoCliente(c.getCodigoCliente());
+				p.getFkCliente().setNome(c.getNome());
+				p.getFkCliente().setPessoa(c.getPessoa());
+				p.getFkCliente().setInscricaoEstadual(c.getInscricaoEstadual());
+				p.getFkCliente().setEmail(c.getEmail());
+				p.getFkCliente().setCep(c.getCep());
+				p.getFkCliente().setLogradouro(c.getLogradouro());
+				p.getFkCliente().setNumero(c.getNumero());
+				p.getFkCliente().setComplemento(c.getComplemento());
+				p.getFkCliente().setBairro(c.getBairro());
+				p.getFkCliente().setMunicipio(c.getMunicipio());
+				p.getFkCliente().setUf(c.getUf());
+				p.getFkCliente().setInformacoesReferencia(c.getInformacoesReferencia());
+
+				p.setCodigoCliente(p.getFkCliente().getCodigoCliente());
+				p.setClientePessoa(p.getFkCliente().getPessoa().toString());
+				p.setEntregaNome(p.getFkCliente().getNome());
+				p.setEntregaRua(p.getFkCliente().getLogradouro());
+				p.setEntregaNumero(p.getFkCliente().getNumero());
+				p.setEntregaComplemento(p.getFkCliente().getComplemento());
+				p.setEntregaBairro(p.getFkCliente().getBairro());
+				p.setEntregaMunicipio(p.getFkCliente().getMunicipio());
+				p.setEntregaUf(p.getFkCliente().getUf());
+				p.setEntregaCep(p.getFkCliente().getCep());
+
+				PedidoServices ps = new PedidoServices();
+				ps.setSttm(ls.getSttm());
+				RetornoWS<Pedido> retornoPedido = new RetornoWS<Pedido>();
+				try {
+					retornoPedido = ps.insertPedido(p);
+					((Pedido) retornoPedido.getModel())
+							.setCodigoPedido(ps.getPedidoForId(((Pedido) retornoPedido.getModel()).getCodigoPedido()));
+					p.setCodigoPedido(((Pedido) retornoPedido.getModel()).getCodigoPedido());
+					if (retornoPedido.getCodStatus() == 1) {
+						ips.setSttm(ls.getSttm());
+						int i = 0;
+						while (i < p.getLstItems().size()) {
+							((ItemPedido) p.getLstItems().get(i)).setCodigoPedido(p.getCodigoPedido());
+							retornoItem = ips.insertItemPedido((ItemPedido) p.getLstItems().get(i));
+							if (retornoItem.getCodStatus() != 1) {
+								ips.deleteAllItemsPedido(p.getCodigoPedido());
+								ps.invalidarPedido(p, retornoItem.getMsg());
+								ls.CloseConnection();
+								return Response.ok((Object) retornoItem).build();
+							}
+							++i;
+						}
+						ls.CloseConnection();
+						System.out.println("Retorno WS: " + retornoPedido.getModel());
+						retornoPedido.setCodStatus(3L);
+						retornoPedido.setMsg("Seu cadastro está incompleto, complete as informações na próxima tela");
+						return Response.ok((Object) retornoPedido).build();
+					}
+					ls.CloseConnection();
+					return Response.ok((Object) retornoPedido).build();
+				} catch (SQLException e2) {
+					try {
+						ips.deleteAllItemsPedido(((Pedido) retornoPedido.getModel()).getCodigoPedido());
+						ps.invalidarPedido((Pedido) retornoPedido.getModel(), e2.getMessage());
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					System.out.println("Falha ao inserir dados no banco: " + e2);
+					RetornoWS<Object> retorno = new RetornoWS<Object>();
+					retorno.setCodStatus(Long.valueOf(4));
+					retorno.setMsg("Não foi possível acessar o banco de dados! " + e2.getMessage());
+					retorno.setModel((Object) null);
+					return Response.ok((Object) retorno).build();
+				}
+
+			}
+			if (retornoCliente.getCodStatus() == 1) {
+				p.getFkCliente().setCodigoCliente(((Cliente) retornoCliente.getModel()).getCodigoCliente());
+				p.getFkCliente().setNome(((Cliente) retornoCliente.getModel()).getNome());
+				p.getFkCliente().setCpf(((Cliente) retornoCliente.getModel()).getCpf());
+				p.getFkCliente().setRg(((Cliente) retornoCliente.getModel()).getRg());
+				p.getFkCliente().setRazaoSocial(((Cliente) retornoCliente.getModel()).getRazaoSocial());
+				p.getFkCliente().setCnpj(((Cliente) retornoCliente.getModel()).getCnpj());
+				p.getFkCliente().setPessoa(((Cliente) retornoCliente.getModel()).getPessoa());
+				p.getFkCliente().setDataNascimento(((Cliente) retornoCliente.getModel()).getDataNascimento());
+				p.getFkCliente().setInscricaoEstadual(((Cliente) retornoCliente.getModel()).getInscricaoEstadual());
+				p.getFkCliente().setEmail(((Cliente) retornoCliente.getModel()).getEmail());
+				p.getFkCliente().setCep(((Cliente) retornoCliente.getModel()).getCep());
+				p.getFkCliente().setLogradouro(((Cliente) retornoCliente.getModel()).getLogradouro());
+				p.getFkCliente().setNumero(((Cliente) retornoCliente.getModel()).getNumero());
+				p.getFkCliente().setComplemento(((Cliente) retornoCliente.getModel()).getComplemento());
+				p.getFkCliente().setBairro(((Cliente) retornoCliente.getModel()).getBairro());
+				p.getFkCliente().setMunicipio(((Cliente) retornoCliente.getModel()).getMunicipio());
+				p.getFkCliente().setUf(((Cliente) retornoCliente.getModel()).getUf());
+				p.getFkCliente().setDdd1(((Cliente) retornoCliente.getModel()).getDdd1());
+				p.getFkCliente().setDdd2(((Cliente) retornoCliente.getModel()).getDdd2());
+				p.getFkCliente().setTelefone1(((Cliente) retornoCliente.getModel()).getTelefone1());
+				p.getFkCliente().setTelefone2(((Cliente) retornoCliente.getModel()).getTelefone2());
+				p.getFkCliente()
+						.setInformacoesReferencia(((Cliente) retornoCliente.getModel()).getInformacoesReferencia());
+				p.setCodigoCliente(p.getFkCliente().getCodigoCliente());
+				p.setClientePessoa(p.getFkCliente().getPessoa().toString());
+				p.setEntregaNome(p.getFkCliente().getNome());
+				p.setEntregaRua(p.getFkCliente().getLogradouro());
+				p.setEntregaNumero(p.getFkCliente().getNumero());
+				p.setEntregaComplemento(p.getFkCliente().getComplemento());
+				p.setEntregaBairro(p.getFkCliente().getBairro());
+				p.setEntregaMunicipio(p.getFkCliente().getMunicipio());
+				p.setEntregaUf(p.getFkCliente().getUf());
+				p.setEntregaCep(p.getFkCliente().getCep());
+				PedidoServices ps = new PedidoServices();
+				ps.setSttm(ls.getSttm());
+				RetornoWS<Pedido> retornoPedido = new RetornoWS<Pedido>();
+				try {
+					retornoPedido = ps.insertPedido(p);
+					((Pedido) retornoPedido.getModel())
+							.setCodigoPedido(ps.getPedidoForId(((Pedido) retornoPedido.getModel()).getCodigoPedido()));
+					p.setCodigoPedido(((Pedido) retornoPedido.getModel()).getCodigoPedido());
+					if (retornoPedido.getCodStatus() == 1) {
+						ips.setSttm(ls.getSttm());
+						int i = 0;
+						while (i < p.getLstItems().size()) {
+							((ItemPedido) p.getLstItems().get(i)).setCodigoPedido(p.getCodigoPedido());
+							retornoItem = ips.insertItemPedido((ItemPedido) p.getLstItems().get(i));
+							if (retornoItem.getCodStatus() != 1) {
+								ips.deleteAllItemsPedido(p.getCodigoPedido());
+								ps.invalidarPedido(p, retornoItem.getMsg());
+								ls.CloseConnection();
+								return Response.ok((Object) retornoItem).build();
+							}
+							++i;
+						}
+						ls.CloseConnection();
+						System.out.println("Retorno WS: " + retornoPedido.getModel());
+						return Response.ok((Object) retornoPedido).build();
+					}
+					ls.CloseConnection();
+					return Response.ok((Object) retornoPedido).build();
+				} catch (SQLException e) {
+					try {
+						ips.deleteAllItemsPedido(((Pedido) retornoPedido.getModel()).getCodigoPedido());
+						ps.invalidarPedido((Pedido) retornoPedido.getModel(), e.getMessage());
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+					System.out.println("Falha ao inserir dados no banco: " + e);
+					RetornoWS<Object> retorno = new RetornoWS<Object>();
+					retorno.setCodStatus(Long.valueOf(4));
+					retorno.setMsg("Não foi possível acessar o banco de dados! " + e.getMessage());
+					retorno.setModel((Object) null);
+					return Response.ok((Object) retorno).build();
+				}
+			}
+			ls.CloseConnection();
+
+			return Response.ok((Object) retornoCliente).build();
+		} else {
+			new Email().send(request);
+			return Response.status(404).build();
+		}
+
+	}
 
 	@POST
 	@Path(value = "/novocliente")
@@ -303,6 +500,45 @@ public class WS {
 				retorno.setModel((Object) null);
 				return Response.ok((Object) retorno).build();
 			}
+		} else {
+			new Email().send(request);
+			return Response.status(404).build();
+		}
+	}
+	
+	@POST
+	@Path(value = "/cadastrarCliente")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response cadastrarCliente(Cliente c, @Context HttpServletRequest request) {
+		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
+			System.out.println("Pedido: " + (Object) c);
+			ClienteService cs = new ClienteService();
+			try {
+				cs.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retornoCliente = new RetornoWS<Cliente>();
+			try {
+				retornoCliente = cs.insertCliente(c);
+				
+			} catch (Exception e) {
+				
+				cs.CloseConnection();
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Erro ao criar pedido!" + e.getMessage());
+				retorno.setModel((Object) null);
+				return Response.ok((Object) retorno).build();
+			}
+			cs.CloseConnection();
+			return Response.ok((Object) retornoCliente).build();
 		} else {
 			new Email().send(request);
 			return Response.status(404).build();
@@ -417,6 +653,7 @@ public class WS {
 	@Path(value = "/loginPainel")
 	@Produces(value = { "application/json; charset=UTF-8" })
 	public Response loginPainel(Cliente c, @Context HttpServletRequest request) {
+		System.out.println("Logando..");
 		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
 			LoginServices ls = new LoginServices();
 			try {
@@ -475,9 +712,16 @@ public class WS {
 						p.setFkCliente(retornoCliente.getModel());
 						p.setLstItems(ips.getItemsForCodigoPedido(p.getCodigoPedido()).getModel());
 					}
+				}else if(retornoPedidos.getCodStatus() == 3){
+					Pedido pedid = new Pedido();
+					pedid.setFkCliente(retornoCliente.getModel());
+					ArrayList<Pedido> lstPedido = new ArrayList<Pedido>();
+					lstPedido.add(pedid);
+					retornoPedidos.setModel(lstPedido);
 				}
 
 				ls.CloseConnection();
+				System.out.println("Pedido: " + retornoPedidos.getModel());
 				return Response.ok((Object) retornoPedidos).build();
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -490,6 +734,64 @@ public class WS {
 			}
 			//
 			
+		} else {
+			new Email().send(request);
+			return Response.status(404).build();
+		}
+	}
+	
+	@POST
+	@Path(value = "/loginPainelBySessaoCarrinho")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response loginPainelBySessaoCarrinho(Cliente c, @Context HttpServletRequest request) {
+		System.out.println("Logando pela sessão do carrinho");
+		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
+			LoginServices ls = new LoginServices();
+			try {
+				ls.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			
+			//GET PEDIDOS
+			PedidoServices ps = new PedidoServices();
+			ps.setSttm(ls.getSttm());
+			RetornoWS<List<Pedido>> retornoPedidos = new RetornoWS<List<Pedido>>();
+			try {
+				retornoPedidos = ps.getPedidosForCliente(c.getCodigoCliente());
+				if (retornoPedidos.getCodStatus() == 1) {
+					ItemPedidoServices ips = new ItemPedidoServices();
+					ips.setSttm(ps.getSttm());
+					for (Pedido p : retornoPedidos.getModel()) {
+						p.setFkCliente(c);
+						p.setLstItems(ips.getItemsForCodigoPedido(p.getCodigoPedido()).getModel());
+					}
+				}else if(retornoPedidos.getCodStatus() == 3){
+					Pedido pedid = new Pedido();
+					pedid.setFkCliente(c);
+					ArrayList<Pedido> lstPedido = new ArrayList<Pedido>();
+					lstPedido.add(pedid);
+					retornoPedidos.setModel(lstPedido);
+				}
+
+				ls.CloseConnection();
+				System.out.println("Pedido: " + retornoPedidos.getModel());
+				return Response.ok((Object) retornoPedidos).build();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				ls.CloseConnection();
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(-1));
+				retornoE.setMsg("Erro ao buscar os pedidos: " + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
 		} else {
 			new Email().send(request);
 			return Response.status(404).build();
@@ -977,6 +1279,44 @@ public class WS {
 			return Response.status(404).build();
 		}
 	}
+	
+	@POST
+	@Path(value = "/verificarSenhaCliente")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response verifyPasswordClient(Cliente c, @Context HttpServletRequest request) {
+		if ((c.getUsr().equals("pdroqtl")) && (c.getPwd().equals("jck9com*"))) {
+			System.out.println("Cliente: " + (Object) c);
+			ClienteService cs = new ClienteService();
+			try {
+				cs.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+			try {
+				retorno = cs.verifySenhaCliente(c);
+				cs.CloseConnection();
+				System.out.println((Object) retorno);
+				return Response.ok((Object) retorno).build();
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(4));
+				retornoE.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
+		} else{
+			new Email().send(request);
+			return Response.status(404).build();
+		}
+	}
 
 	@POST
 	@Path(value = "/atualizarSenhaCliente")
@@ -1081,6 +1421,48 @@ public class WS {
 			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
 			try {
 				retorno = cs.searchEmail(email.toLowerCase());
+				cs.CloseConnection();
+				System.out.println((Object) retorno);
+				return Response.ok((Object) retorno).build();
+			} catch (SQLException e) {
+				System.out.println("Erro: " + e);
+				RetornoWS<Object> retornoE = new RetornoWS<Object>();
+				retornoE.setCodStatus(Long.valueOf(4));
+				retornoE.setMsg("Erro ao criar pedido!" + e.getMessage());
+				retornoE.setModel((Object) null);
+				return Response.ok((Object) retornoE).build();
+			}
+		} else
+
+		{
+			new Email().send(request);
+			return Response.status(404).build();
+		}
+
+	}
+	
+	@POST
+	@Path(value = "/pesquisarEmailClienteSimple")
+	@Produces(value = { "application/json; charset=UTF-8" })
+	public Response searchEmailClientSimple(@FormParam(value = "email") String email, @FormParam(value = "usr") String usr,
+			@FormParam(value = "pwd") String pwd, @Context HttpServletRequest request) {
+		if ((usr.equals("pdroqtl")) && (pwd.equals("jck9com*"))) {
+			System.out.println("Email: " + email);
+			ClienteService cs = new ClienteService();
+			try {
+				cs.CreateConnection();
+			} catch (Exception e) {
+				System.out.println("Erro ao criar a conexão: " + e);
+				RetornoWS<Object> retorno = new RetornoWS<Object>();
+				retorno.setCodStatus(Long.valueOf(4));
+				retorno.setMsg("Não foi possível acessar o banco de dados!" + e.getMessage());
+				retorno.setModel((Object) null);
+				e.printStackTrace();
+				return Response.ok((Object) retorno).build();
+			}
+			RetornoWS<Cliente> retorno = new RetornoWS<Cliente>();
+			try {
+				retorno = cs.searchEmailSimple(email.toLowerCase());
 				cs.CloseConnection();
 				System.out.println((Object) retorno);
 				return Response.ok((Object) retorno).build();
