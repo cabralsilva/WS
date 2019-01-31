@@ -1,7 +1,6 @@
 package com.ibolt.services;
 
 import com.ibolt.models.Cliente;
-import com.ibolt.models.Pedido;
 import com.ibolt.models.RetornoWS;
 import com.ibolt.services.ControlServices;
 import java.sql.ResultSet;
